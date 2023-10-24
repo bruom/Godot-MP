@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbf26kjcp51x4"]
+
+[ext_resource type="Script" path="res://Scenes/TableManager/table_manager.gd" id="1_6bpvp"]
+[ext_resource type="Script" path="res://Scripts/game_manager.gd" id="2_axpkx"]
+
+[node name="table_manager" type="Node"]
+script = ExtResource("1_6bpvp")
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("2_axpkx")

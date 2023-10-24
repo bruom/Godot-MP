@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://6fm4wo7p4cah"]
+
+[ext_resource type="Script" path="res://Scenes/LocalTable/local_table.gd" id="1_1jm1x"]
+[ext_resource type="PackedScene" uid="uid://d1elxw5twh42i" path="res://Scenes/LocalTable/Grid/token_grid_2d.tscn" id="2_elo0n"]
+[ext_resource type="PackedScene" uid="uid://b6c3ghmlo0csk" path="res://Scenes/LocalTable/Hero/hero_2d.tscn" id="3_xiitb"]
+[ext_resource type="Texture2D" uid="uid://brckf10o6wixu" path="res://Assets/Textures/chevron.svg" id="4_0glt0"]
+[ext_resource type="Script" path="res://Scenes/LocalTable/Grid/grid_preview.gd" id="5_vtgkf"]
+
+[node name="local_table" type="Node2D"]
+script = ExtResource("1_1jm1x")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+anchor_mode = 0
+
+[node name="lines" type="Node" parent="."]
+
+[node name="player_grid" parent="lines" instance=ExtResource("2_elo0n")]
+position = Vector2(601, 538)
+
+[node name="opponent_grid" parent="lines" instance=ExtResource("2_elo0n")]
+position = Vector2(1322, 538)
+flipped = true
+
+[node name="helpers" type="Node" parent="."]
+
+[node name="Node2D" type="Node2D" parent="helpers"]
+position = Vector2(1920, 566)
+
+[node name="player_hero" parent="." instance=ExtResource("3_xiitb")]
+position = Vector2(86, 84)
+
+[node name="opponent_hero" parent="." instance=ExtResource("3_xiitb")]
+position = Vector2(1835, 84)
+
+[node name="row_indicator" type="Sprite2D" parent="."]
+position = Vector2(244, 188)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("4_0glt0")
+
+[node name="preview_rect" type="ColorRect" parent="."]
+offset_left = 161.0
+offset_top = 259.0
+offset_right = 261.0
+offset_bottom = 359.0
+script = ExtResource("5_vtgkf")

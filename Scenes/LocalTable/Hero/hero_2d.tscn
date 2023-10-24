@@ -1,0 +1,65 @@
+[gd_scene load_steps=4 format=3 uid="uid://b6c3ghmlo0csk"]
+
+[ext_resource type="Texture2D" uid="uid://gj4qegfofkhv" path="res://Assets/Textures/white.png" id="1_7ogk2"]
+[ext_resource type="Script" path="res://Scenes/LocalTable/Hero/hero_2d.gd" id="1_lo34t"]
+[ext_resource type="Texture2D" uid="uid://c826vhfocky3a" path="res://icon.svg" id="2_7cryb"]
+
+[node name="hero_2d" type="Node2D"]
+script = ExtResource("1_lo34t")
+
+[node name="hero_bg" type="Sprite2D" parent="."]
+self_modulate = Color(0.239216, 0.239216, 0.239216, 1)
+scale = Vector2(124, 124)
+texture = ExtResource("1_7ogk2")
+
+[node name="hero_sprite" type="Sprite2D" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+texture = ExtResource("2_7cryb")
+
+[node name="placeholder" type="Label" parent="hero_sprite"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -107.5
+offset_top = -90.0
+offset_right = -20.5
+offset_bottom = -38.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Hero sprite 
+goes here"
+horizontal_alignment = 1
+
+[node name="hp_label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = 66.8333
+offset_right = 20.0
+offset_bottom = 89.1667
+grow_horizontal = 2
+grow_vertical = 2
+text = "100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ap_label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = 90.0
+offset_right = 20.0
+offset_bottom = 116.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1

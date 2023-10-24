@@ -1,0 +1,29 @@
+[
+  {
+	"unit_id": 0,
+	"name": "placeholder",
+	"texture_path": "icon.svg",
+	"size": 0,
+	"timer": 2,
+	"combo_power": 15,
+	"idle_power": 2
+  },
+  {
+	"unit_id": 1,
+	"name": "placeholder",
+	"texture_path": "icon.svg",
+	"size": 1,
+	"timer": 3,
+	"combo_power": 25,
+	"idle_power": 4
+  },
+  {
+	"unit_id": 2,
+	"name": "placeholder",
+	"texture_path": "icon.svg",
+	"size": 2,
+	"timer": 4,
+	"combo_power": 50,
+	"idle_power": 6
+  }
+]

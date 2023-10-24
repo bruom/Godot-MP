@@ -1,0 +1,161 @@
+[gd_scene load_steps=6 format=3 uid="uid://obawne03blk4"]
+
+[ext_resource type="Script" path="res://Scenes/Lobby/lobby.gd" id="1_3qjmh"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_5d3os"]
+font_size = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_178sj"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.184314, 0.184314, 0.184314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8hjk3"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8ibs6"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+
+[node name="lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3qjmh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_bottom = 99.0
+grow_horizontal = 0
+theme_override_constants/separation = 15
+
+[node name="host" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Host"
+
+[node name="join" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Join
+"
+
+[node name="start" type="Button" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Start"
+
+[node name="exit" type="Button" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Exit Lobby"
+
+[node name="status_label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -86.5
+offset_right = 86.5
+offset_bottom = 44.0
+grow_horizontal = 2
+text = "Not connected"
+label_settings = SubResource("LabelSettings_5d3os")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="connections_label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -142.0
+offset_top = 79.0
+offset_right = 142.0
+offset_bottom = 131.0
+grow_horizontal = 2
+text = "Connected players:
+no one :("
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 293.0
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer2"]
+layout_mode = 2
+alignment = 1
+
+[node name="username_label" type="Label" parent="VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+text = "Username: "
+vertical_alignment = 1
+
+[node name="name_field" type="LineEdit" parent="VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="Panel" type="Panel" parent="VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_178sj")
+
+[node name="chatbox" type="RichTextLabel" parent="VBoxContainer2/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_8hjk3")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_8ibs6")
+scroll_following = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer2"]
+layout_mode = 2
+
+[node name="text_input_field" type="LineEdit" parent="VBoxContainer2/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="text_send_button" type="Button" parent="VBoxContainer2/HBoxContainer2"]
+layout_mode = 2
+text = "Send"
+
+[connection signal="button_down" from="VBoxContainer/host" to="." method="_on_host_button_down"]
+[connection signal="button_down" from="VBoxContainer/join" to="." method="_on_join_button_down"]
+[connection signal="button_down" from="VBoxContainer/start" to="." method="_on_start_button_down"]
+[connection signal="button_down" from="VBoxContainer/exit" to="." method="_on_exit_button_down"]
+[connection signal="text_submitted" from="VBoxContainer2/HBoxContainer/name_field" to="." method="_on_name_field_text_submitted"]
+[connection signal="text_submitted" from="VBoxContainer2/HBoxContainer2/text_input_field" to="." method="_on_text_input_field_text_submitted"]
+[connection signal="button_down" from="VBoxContainer2/HBoxContainer2/text_send_button" to="." method="_on_text_send_button_button_down"]

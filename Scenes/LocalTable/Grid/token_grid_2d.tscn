@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1elxw5twh42i"]
+
+[ext_resource type="Script" path="res://Scenes/LocalTable/Grid/token_grid_2d.gd" id="1_utwdw"]
+[ext_resource type="Texture2D" uid="uid://gj4qegfofkhv" path="res://Assets/Textures/white.png" id="3_nsitq"]
+
+[node name="TokenGrid2D" type="Node2D"]
+script = ExtResource("1_utwdw")
+
+[node name="spawn_x" type="Node2D" parent="."]
+position = Vector2(-336, 0)
+
+[node name="grid_bg" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.0196078)
+scale = Vector2(600, 800)
+texture = ExtResource("3_nsitq")

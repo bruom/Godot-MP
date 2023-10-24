@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://c024voh0grjd6"]
+
+[ext_resource type="Script" path="res://Scenes/LocalTable/Token/Single/single_token_2d.gd" id="1_2p2rh"]
+[ext_resource type="Texture2D" uid="uid://c826vhfocky3a" path="res://icon.svg" id="1_5sejf"]
+[ext_resource type="Texture2D" uid="uid://cdpvm0aapusaa" path="res://Assets/Textures/shieldico.svg" id="2_e4q2r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_02n7j"]
+size = Vector2(131, 132)
+
+[node name="single_token_2d" type="Node2D"]
+script = ExtResource("1_2p2rh")
+
+[node name="token_image" type="Sprite2D" parent="."]
+texture_repeat = 2
+texture = ExtResource("1_5sejf")
+region_rect = Rect2(0, 0, 64, 64)
+
+[node name="defend_icon" type="Sprite2D" parent="token_image"]
+visible = false
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_e4q2r")
+
+[node name="staticbody" type="StaticBody2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="staticbody"]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_02n7j")
