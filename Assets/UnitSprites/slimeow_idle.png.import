@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfhqtui1sl14y"
-path="res://.godot/imported/shieldico.svg-26b9e44663fe8c7a4b4636f366c1d056.ctex"
+uid="uid://d015mednh8cla"
+path="res://.godot/imported/slimeow_idle.png-cabc28f457a9ca06c84721582d541a56.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/shieldico.svg"
-dest_files=["res://.godot/imported/shieldico.svg-26b9e44663fe8c7a4b4636f366c1d056.ctex"]
+source_file="res://Assets/UnitSprites/slimeow_idle.png"
+dest_files=["res://.godot/imported/slimeow_idle.png-cabc28f457a9ca06c84721582d541a56.ctex"]
 
 [params]
 
@@ -31,7 +31,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=1
-svg/scale=3.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
+detect_3d/compress_to=0

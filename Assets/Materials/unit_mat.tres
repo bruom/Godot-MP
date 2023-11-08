@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://dnwwx6ox4s0do"]
+
+[ext_resource type="Shader" path="res://Assets/Shaders/2D/whiteout_glow.gdshader" id="1_8gcmn"]
+[ext_resource type="Texture2D" uid="uid://d015mednh8cla" path="res://Assets/UnitSprites/slimeow_idle.png" id="2_q2qfl"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_8gcmn")
+shader_parameter/sprite_size = Vector2i(50, 50)
+shader_parameter/progress = 0.0
+shader_parameter/glow_color = Color(1, 1, 1, 1)
+shader_parameter/disappear_prog = 0.0
+shader_parameter/main_tex = ExtResource("2_q2qfl")

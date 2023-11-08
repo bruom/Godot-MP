@@ -158,7 +158,7 @@ func remove_at(row: int, col: int) -> bool:
 		return false
 	if tokens[row][col] != null:
 		var token = tokens[row][col]
-		if token != null:
+		if token != null && token is SingleTokenModel:
 			for aux_row in range(token.cur_row, row + token.dimensions.y):
 				for aux_col in range(token.cur_col, col - token.dimensions.x, -1):
 					if tokens[aux_row][aux_col] == token:
@@ -360,9 +360,13 @@ func defend(new_combo: Array[SingleTokenModel]):
 			pass
 			#add_extra_defender(token)
 		else:
-			token.defending = true
+			var wall_token = SingleTokenModel.create_wall(token.cur_power)
+			clear_token_from_grid(token)
+			set_token_at(wall_token, token.cur_row, token.cur_col)
+			wall_token.set_position(token.cur_row, token.cur_col)
+			#token.defending = true
 			#token_defending.emit(token)
-			event_queue.append(DefendEvent.create(token))
+			event_queue.append(DefendEvent.create(token, wall_token))
 
 # CURRENTLY BROKEN
 #When a unit would become part of both a horizontal and a vertical combo at the
@@ -387,6 +391,17 @@ func get_last_unit_in_row(row: int) -> TokenModel:
 	if last_col > -1:
 		return tokens[row][last_col]
 	return null
+
+func unit_can_be_picked(unit: TokenModel) -> bool:
+	if !(unit is SingleTokenModel) || unit.defending:
+		return false
+	
+	var rows = unit.get_rows()
+	for row in rows:
+		if get_last_unit_in_row(row) != unit:
+			return false
+	
+	return true
 
 #Checks whether a target row can receive a unit being moved, and where it would end up
 func preview_col_for_unit(unit: SingleTokenModel, target_row: int) -> int:
@@ -446,7 +461,14 @@ static func deserialize(dict: Dictionary) -> GridModel:
 	var line = GridModel.new()
 	line.tokens.assign(dict["tokens"].map(
 		func(row): return row.map(
-			func(token): return null if token == null else SingleTokenModel.deserialize(token))
+			func(token): 
+				if token == null:
+					return null
+				else:
+					if token.has("cur_timer"):
+						return ComboTokenModel.deserialize(token)
+					else:
+						return SingleTokenModel.deserialize(token))
 		)
 	)
 	return line

@@ -53,16 +53,8 @@ func start_game():
 func tick_turn():
 	if multiplayer.is_server():
 		game_manager.tick_turn()
+		client_update_state.rpc(game_manager.table_state.serialize())
 		begin_turn.rpc(turn_player_id)
-
-@rpc("any_peer", "call_remote", "reliable")
-func player_played_unit(unit_id: int, row: int):
-	var unit_data = JsonLoader.all_cards[float(unit_id)]
-	var token_model = SingleTokenModel.create(unit_data, 0)
-	var grid = table_state.player_a_grid if multiplayer.get_remote_sender_id() == player_a.peer_id else table_state.player_b_grid
-	var success = grid.add_token(token_model, row)
-	if success:
-		add_token.rpc(multiplayer.get_remote_sender_id(), token_model.serialize(), row)
 
 @rpc("any_peer", "call_remote", "reliable")
 func player_moved_unit(from_row: int, to_row: int):
@@ -118,37 +110,30 @@ func _on_end_turn():
 @rpc("call_remote")
 func add_token(player_id, token_model: Dictionary, row: int):
 	if player_a.peer_id == player_id:
-		local_table.model.player_a_grid.add_token(SingleTokenModel.deserialize(token_model), row)
+		game_manager.table_state.player_a_grid.add_token(SingleTokenModel.deserialize(token_model), row)
 	else:
-		local_table.model.player_b_grid.add_token(SingleTokenModel.deserialize(token_model), row)
+		game_manager.table_state.player_b_grid.add_token(SingleTokenModel.deserialize(token_model), row)
 
 @rpc("call_remote")
 func add_tokens(player_id, token_models: Array):
-	var grid = local_table.model.player_a_grid if player_a.peer_id == player_id else local_table.model.player_b_grid
-	var tokens = token_models.map(func(data): return SingleTokenModel.deserialize(data))
-	for token in tokens:
-		if token is TokenModel:
-			grid.add_token(token, token.cur_row)
-			grid.emit_events()
+	var player = player_a if player_a.peer_id == player_id else player_b
+	var tokens: Array[TokenModel] = []
+	tokens.assign(token_models.map(func(data): return SingleTokenModel.deserialize(data)))
+	game_manager.add_units(player, tokens)
 
 @rpc("call_remote")
 func move_token(player_id, from_row: int, to_row: int):
-	var grid = local_table.model.player_a_grid if player_a.peer_id == player_id else local_table.model.player_b_grid
 	var player = player_a if player_a.peer_id == player_id else player_b
 	game_manager.basic_move(player, from_row, to_row)
-	grid.emit_events()
 
 @rpc("call_remote")
 func remove_token(player_id, row: int, col: int):
-	var grid = local_table.model.player_a_grid if player_a.peer_id == player_id else local_table.model.player_b_grid
 	var player = player_a if player_a.peer_id == player_id else player_b
 	game_manager.basic_remove(player, row, col)
-	grid.emit_events()
 
 @rpc("call_remote")
 func client_update_state(new_table_state: Dictionary):
 	table_state = TableModel.deserialize(new_table_state)
-	print(str(multiplayer.get_unique_id()) + " updated!")
 
 @rpc("call_remote")
 func begin_turn(player_id):

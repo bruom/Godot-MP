@@ -25,6 +25,14 @@ static func create(_unit: UnitData, _token_class: int) -> SingleTokenModel:
 	model.dimensions = _unit.dimensions
 	return model
 
+static func create_wall(base_power: int) -> SingleTokenModel:
+	var model = SingleTokenModel.new()
+	model.unit = JsonLoader.all_units[3]
+	model.cur_power = base_power
+	model.dimensions = model.unit.dimensions
+	model.defending = true
+	return model
+
 func serialize() -> Dictionary:
 	var dict = {}
 	dict["unit_id"] = unit.unit_id

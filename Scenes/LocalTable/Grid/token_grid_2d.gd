@@ -50,7 +50,7 @@ func _on_grid_events(events: Array[GridEvent]):
 		if event is FormNonbasicComboEvent:
 			_on_nonbasic_combo_formed(event.combo, event.aux_tokens, event.position)
 		if event is DefendEvent:
-			_on_token_defending(event.token)
+			_on_token_defending(event.token, event.wall)
 		if event is AddDefenderEvent:
 			_on_extra_defender_added(event.token)
 		
@@ -69,7 +69,7 @@ func _on_token_moved(token_model: TokenModel, target_row: int, target_col: int):
 			grid_tween.tween_callback(ui_done)
 
 func _on_token_added(token_model: SingleTokenModel, _row: int, _col: int):
-	var token = token_scene.instantiate()
+	var token = token_model.unit.scene.instantiate()
 	add_child(token)
 	token.flipped = flipped
 	token.setup(token_model)
@@ -86,19 +86,34 @@ func _on_token_removed(token_model: TokenModel, _row: int, _col: int):
 	var node = get_token_from_model(token_model)
 	tokens.erase(node)
 	if grid_tween && node:
-		grid_tween.tween_property(node, "opacity", 0.0, 0.1 * anim_duration_mult)
-		grid_tween.tween_callback(ui_done)
-		grid_tween.tween_callback(node.queue_free)
+		grid_tween.tween_callback(func():
+			if node != null:
+				node.destroy()
+		)
+		grid_tween.tween_interval(0.5)
 
-func _on_token_defending(token_model: SingleTokenModel):
+func _on_token_defending(token_model: SingleTokenModel, wall_model: SingleTokenModel):
 	var token = get_token_from_model(token_model)
 	if token:
+		var coords = token_model.position
 		#play defend animation here
-		token.defend_icon.show()
+		#token.defend_icon.show()
+
+		tokens.erase(token)
+		var wall_unit = JsonLoader.all_units[3]
+		var wall_token = wall_unit.scene.instantiate()
+		add_child(wall_token)
+		wall_token.flipped = flipped
+		wall_token.setup(wall_model)
+		tokens.append(wall_token)
+		wall_token.position = get_position_for_tile(coords.y, coords.x)
+		wall_token.hide()
+		
 		if grid_tween:
-			token.defend_icon.set_modulate(Color.TRANSPARENT)
-			grid_tween.tween_property(token.defend_icon, "modulate", Color.WHITE, 0.2 * anim_duration_mult)
-			grid_tween.tween_callback(ui_done)
+			grid_tween.tween_callback(func():
+				remove_child(token)
+				wall_token.show()
+			)
 
 func _on_combo_formed(combo: ComboTokenModel, combo_position: Vector2i):
 	var new_combo = combo_scene.instantiate()
@@ -113,8 +128,11 @@ func _on_combo_formed(combo: ComboTokenModel, combo_position: Vector2i):
 	for token_in_combo in get_tokens_from_models(combo.tokens):
 		tokens.erase(token_in_combo)
 	tokens.append(new_combo)
+	new_combo.combo_frame.hide()
 	if grid_tween:
-		grid_tween.tween_callback(ui_done).set_delay(0.3)
+		grid_tween.tween_callback(func():
+			new_combo.combo_frame.show()
+		)
 
 func _on_nonbasic_combo_formed(combo: ComboTokenModel, aux_units: Array[SingleTokenModel], combo_position: Vector2i):
 	_on_combo_formed(combo, combo_position)
@@ -130,7 +148,8 @@ func _on_extra_defender_added(token_model: SingleTokenModel):
 	token.setup(token_model)
 	tokens.append(token)
 	token.position = get_position_for_tile(token_model.cur_row, token_model.cur_col)
-	_on_token_defending(token_model)
+	print("Extra defender not implemented")
+	#_on_token_defending(token_model)
 
 func force_sync_with_model():
 	for token in tokens:
@@ -206,7 +225,7 @@ func get_token_from_model(token_model: TokenModel):
 	if token_model == null:
 		return null
 	for token in tokens:
-		if token.token_model == token_model:
+		if token != null && token.token_model == token_model:
 			return token
 	return null
 

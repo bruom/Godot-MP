@@ -9,8 +9,14 @@ var turn_player: PlayerData
 signal token_events(events: Array[TokenEvent])
 
 func _process(_delta):
-	table_state.player_a_grid.trigger_effects()
-	table_state.player_b_grid.trigger_effects()
+	while table_state.player_a_grid.should_emit_events:
+		table_state.player_a_grid.trigger_effects()
+	while table_state.player_b_grid.should_emit_events:
+		table_state.player_b_grid.trigger_effects()
+
+func update_table_state(new_state: TableModel):
+	table_state = new_state
+	
 
 #Regularly used when moving from one turn to the next, switching active player
 func tick_turn():
@@ -72,6 +78,12 @@ func handle_attack(combo_model: ComboTokenModel, attacking_player: PlayerData):
 	events.append(DestroyEvent.create(combo_model))
 	token_events.emit(events)
 
+func add_units(player: PlayerData, units: Array[TokenModel]):
+	var grid = table_state.player_a_grid if player == player_a else table_state.player_b_grid
+	for unit in units:
+		grid.add_token(unit, unit.cur_row)
+	grid.emit_events()
+
 #Player Actions
 
 func basic_move(player: PlayerData, from_row: int, to_row: int) -> bool:
@@ -82,17 +94,19 @@ func basic_move(player: PlayerData, from_row: int, to_row: int) -> bool:
 		var success = grid.move_token(from_row, to_row)
 		if success:
 			hero.cur_ap -= 1
+			grid.emit_events()
 			return true
 	return false
 
 func basic_remove(player: PlayerData, row: int, col: int) -> bool:
-	var grid = table_state.player_a_grid if turn_player == player_a else table_state.player_b_grid
-	var hero = table_state.player_a_hero if turn_player == player_a else table_state.player_b_hero
+	var grid = table_state.player_a_grid if player == player_a else table_state.player_b_grid
+	var hero = table_state.player_a_hero if player == player_a else table_state.player_b_hero
 	
 	if hero.cur_ap >= 1 && turn_player == player:
 		var success = grid.remove_at(row, col)
 		if success:
 			hero.cur_ap -= 1
+			grid.emit_events()
 			return true
 	return false
 
@@ -143,6 +157,7 @@ func generate_reinforcements(reinforcements_player: PlayerData) -> Array[TokenMo
 #	for i in range(0, Constants.NUM_UNIT_CLASSES):
 #		print(str(grid.all_tokens.filter((func(t): return t.token_class == i)).size()))
 	
+	grid.emit_events()
 	return added_units
 
 func place_any_class(grid: GridModel, count: int) -> Array[TokenModel]:

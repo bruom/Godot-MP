@@ -1,0 +1,72 @@
+[gd_scene load_steps=7 format=3 uid="uid://bppobccbpd236"]
+
+[ext_resource type="Script" path="res://Scenes/LocalTable/Token/Single/single_token_2d.gd" id="1_8a57l"]
+[ext_resource type="Texture2D" uid="uid://dfhqtui1sl14y" path="res://Assets/Textures/shieldico.svg" id="2_2h8ur"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qfph7"]
+size = Vector2(131, 132)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_75rej"]
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_min = 2.5
+scale_max = 2.5
+
+[sub_resource type="Animation" id="Animation_7nt6y"]
+resource_name = "destroy"
+length = 0.5
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v7ssi"]
+_data = {
+"destroy": SubResource("Animation_7nt6y")
+}
+
+[node name="wall_2D" type="Node2D"]
+script = ExtResource("1_8a57l")
+
+[node name="token_image" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_2h8ur")
+region_rect = Rect2(0, 0, 64, 64)
+
+[node name="defend_icon" type="Sprite2D" parent="."]
+texture = ExtResource("2_2h8ur")
+
+[node name="staticbody" type="StaticBody2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="staticbody"]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_qfph7")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 72
+process_material = SubResource("ParticleProcessMaterial_75rej")
+lifetime = 0.25
+one_shot = true
+explosiveness = 0.2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_v7ssi")
+}

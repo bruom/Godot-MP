@@ -20,3 +20,17 @@ var cur_mana: int = 0:
 signal health_changed(new_value: int)
 signal ap_changed(new_value: int)
 signal mana_changed(new_value: int)
+
+func serialize() -> Dictionary:
+	var dict = {}
+	dict["cur_health"] = cur_health
+	dict["cur_ap"] = cur_ap
+	dict["cur_mana"] = cur_mana
+	return dict
+
+static func deserialize(dict: Dictionary) -> HeroModel:
+	var model = HeroModel.new()
+	model.cur_health = dict["cur_health"]
+	model.cur_ap = dict["cur_ap"]
+	model.cur_mana = dict["cur_mana"]
+	return model

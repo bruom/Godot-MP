@@ -2,7 +2,8 @@ class_name UnitData extends Resource
 
 var unit_id: int = 0
 var name: String = "default"
-var texture_path: String = "res://icon.svg"
+var texture_path: String = "res://Assets/UnitSprites/slimeow.png"
+var scene
 var size: int = 0
 
 var dimensions: Vector2i:
@@ -33,4 +34,7 @@ static func from_json(json: Dictionary) -> UnitData:
 	unit.timer = json["timer"]
 	unit.combo_power = json["combo_power"]
 	unit.idle_power = json["idle_power"]
+	
+	var scene_path = Constants.UNIT_SCENE_PATH + json["scene"] + ".tscn"
+	unit.scene = load(scene_path)
 	return unit

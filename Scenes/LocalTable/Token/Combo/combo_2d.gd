@@ -1,7 +1,11 @@
 class_name Combo2D extends Token2D
 
+@onready var attack_scene = preload("res://Scenes/LocalTable/Effects/attack_effect.tscn")
+
 @onready var timer_label: Label = $combo_frame/Panel/timer_label
 @onready var combo_frame = $combo_frame
+
+var attack_effect: AttackEffect
 
 var opacity: float = 1.0:
 	set(new_value):
@@ -18,6 +22,10 @@ var cols: int:
 		return token_model.dimensions.x
 		
 var tokens: Array[Token2D]
+
+func _process(_delta):
+	if tokens.is_empty():
+		queue_free()
 
 func setup(_model: ComboTokenModel, _tokens: Array[Token2D]):
 	token_model = _model
@@ -39,8 +47,35 @@ func append_attack_anim_to_tween(tween: Tween, target_x_position: float):
 	tween.tween_property(self, "scale", original_scale * 0.7, 0.1)
 	tween.tween_property(self, "scale", original_scale, 0.11)
 
+func attack(tween: Tween) -> AttackEffect:
+	var attack_position = tokens[0].global_position
+	combo_frame.hide()
+	
+	tween.tween_interval(0.2)
+	tween.set_parallel(true)
+	for token in tokens:
+		token.attack()
+		tween.tween_property(token, "global_position", attack_position, 0.25)
+	tween.set_parallel(false)
+	
+	var _attack_effect = attack_scene.instantiate()
+	get_parent().add_child(_attack_effect)
+	_attack_effect.visible = false
+	_attack_effect.flipped = flipped
+	_attack_effect.global_position = attack_position
+	attack_effect = _attack_effect
+	tween.tween_property(_attack_effect, "visible", true, 0.01)
+	return _attack_effect
+
+
+func destroy():
+	for token in tokens:
+		if token != null:
+			token.destroy()
+
 func set_color():
 	set_modulate(Color(1.0, 1.0, 1.0, opacity))
 
 func _on_timer_changed(new_value: int):
 	timer_label.text = str(new_value)
+

@@ -24,7 +24,9 @@ var is_multiplayer: bool:
 		return multiplayer.has_multiplayer_peer() && !(multiplayer.multiplayer_peer is OfflineMultiplayerPeer)
 
 var game_manager: GameManager
-var model: TableModel
+var model: TableModel:
+	get:
+		return game_manager.table_state
 
 var interaction_state: InteractionState = InteractionState.IDLE
 #This will be either the selected unit during a move, or the spell/effect
@@ -63,7 +65,6 @@ func _ready():
 func setup(_game_manager: GameManager, _player: PlayerData):
 	player = _player
 	game_manager = _game_manager
-	model = game_manager.table_state
 	player_hero.setup(model.player_a_hero if is_player_a else model.player_b_hero)
 	opponent_hero.setup(model.player_b_hero if is_player_a else model.player_a_hero)
 	player_grid.setup(model.player_a_grid if is_player_a else model.player_b_grid)
@@ -81,50 +82,6 @@ func _process(_delta):
 
 #Turns - these responsibilities will eventually be moved to GameManager
 
-func attack(combo_model: ComboTokenModel, local_player: bool):
-	var rows = combo_model.get_rows()
-	var attacking_grid = player_grid if local_player else opponent_grid
-	var defending_grid = opponent_grid if local_player else player_grid
-	var destroyed_defender_units: Array[TokenModel] = []
-	var combo_node = attacking_grid.get_token_from_model(combo_model)
-	
-	var attack_tween = create_tween()
-	
-	for col in range(0, Constants.NUM_COLS):
-		var defenders: Array[TokenModel] = []
-		for row in rows:
-			var front_token = defending_grid.model.tokens[row][col]
-			if front_token != null && !defenders.has(front_token) && front_token.cur_power > 0:
-				defenders.append(front_token)
-			if !defenders.is_empty():
-				var target_x = defending_grid.to_global(defending_grid.get_position_for_tile(0, col)).x
-				combo_node.append_attack_anim_to_tween(attack_tween, target_x)
-			for defender in defenders:
-				var aux_defender_power = defender.cur_power
-				defender.cur_power -= combo_model.cur_power
-				combo_model.cur_power -= aux_defender_power
-				if defender.cur_power <= 0 && !destroyed_defender_units.has(defender):
-					destroyed_defender_units.append(defender)
-					var destroyed_node = defending_grid.get_token_from_model(defender)
-					attack_tween.tween_callback(func():
-						destroyed_node.destroy_tween()
-					)
-		if combo_model.cur_power <= 0:
-			break
-	
-	if combo_model.cur_power > 0:
-		combo_node.append_attack_anim_to_tween(attack_tween, get_viewport_rect().end.x)
-		#damage opponent player
-		print(str(combo_model.cur_power) + " damage dealt to player!")
-	
-	defending_grid.model.remove_tokens(destroyed_defender_units)
-	attacking_grid.model.remove_token(combo_model)
-	
-	attack_tween.tween_callback(func():
-		defending_grid.model.emit_events()
-		attacking_grid.model.emit_events()
-	)
-
 func add_events_to_queue(events: Array[TokenEvent]):
 	token_event_queue.append(events)
 
@@ -137,18 +94,24 @@ func handle_events(events: Array[TokenEvent]):
 	for event in events:
 		if event is AttackEvent:
 			var attacker_node = get_node_for_model(event.attacker)
-			if attacker_node:
+			if attacker_node.attack_effect == null:
+				attacker_node.attack(event_tween)
+			if attacker_node && attacker_node.attack_effect:
 				var target_x
 				if event.defender == null:
 					target_x = 0.0 if attacker_node.flipped else get_viewport_rect().end.x
 				else:
 					target_x = get_node_for_model(event.defender).global_position.x
-				attacker_node.append_attack_anim_to_tween(event_tween, target_x)
+				#attacker_node.append_attack_anim_to_tween(event_tween, target_x)
+				attacker_node.attack_effect.animate_attack(event_tween, target_x)
 		if event is DestroyEvent:
 			var destroyed_node = get_node_for_model(event.token)
 			event_tween.tween_callback(func():
 				if destroyed_node != null:
-					destroyed_node.destroy_tween()
+					if destroyed_node is Combo2D && destroyed_node.attack_effect != null:
+						destroyed_node.attack_effect.animate_finish()
+					else:
+						destroyed_node.destroy()
 			)
 	event_tween.tween_callback(func():
 		if token_event_queue.is_empty():
@@ -250,7 +213,7 @@ func handle_click(mouse_pos: Vector2):
 	if col >= 0 && col <= Constants.NUM_COLS && row >= 0 && row < Constants.NUM_ROWS:
 		if interaction_state == InteractionState.IDLE:
 			var last_unit = player_grid_model.get_last_unit_in_row(row)
-			if last_unit && last_unit is SingleTokenModel && !last_unit.defending:
+			if last_unit && player_grid_model.unit_can_be_picked(last_unit):
 				var node = get_node_for_model(last_unit)
 				var tween = create_tween()
 				var target_pos = player_grid.to_global(player_grid.get_position_for_tile(row, Constants.NUM_COLS + 1))

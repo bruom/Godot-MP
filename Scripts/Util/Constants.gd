@@ -1,5 +1,8 @@
 class_name Constants extends Object
 
+#Files
+const UNIT_SCENE_PATH:String = "res://Scenes/LocalTable/Token/"
+
 #Grid
 const NUM_ROWS:int = 8
 const NUM_COLS:int = 6
